@@ -24,7 +24,7 @@ export const getFood = q => {
   return dispatch => {
     console.log(2, 'response');
     axios
-      .get(`http://localhost:3001/api/food?q=${q}`)
+      .get(`${process.env.REACT_APP_API_URI}/food?q=${q}`)
       .then(response => {
         console.log(response);
         dispatch({
