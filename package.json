@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "axios": "^0.16.2",
     "bootstrap": "^3.3.7",
     "enzyme": "^2.9.1",
     "flow-bin": "^0.53.1",
@@ -27,6 +28,7 @@
       "git add"
     ]
   },
+  "proxy": "http://localhost:3001/",
   "scripts": {
     "precommit": "lint-staged",
     "flow": "flow",

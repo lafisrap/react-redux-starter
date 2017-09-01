@@ -1,12 +1,21 @@
 import React, { Component } from 'react';
 import { Route, Link } from 'react-router-dom';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import logo from './logo.svg';
 import Home from '../Home';
 import About from '../About';
+import { getFood } from '../../modules/food';
 
-import './index.css'
+import './index.css';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    props.getFood('Milk');
+  }
+
   render() {
     return (
       <div className="App">
@@ -30,4 +39,12 @@ class App extends Component {
   }
 }
 
-export default App;
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      getFood
+    },
+    dispatch
+  );
+
+export default connect(null, mapDispatchToProps)(App);
