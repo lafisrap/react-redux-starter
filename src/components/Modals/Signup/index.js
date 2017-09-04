@@ -12,7 +12,7 @@ import {
   ControlLabel,
   HelpBlock
 } from 'react-bootstrap';
-import { showSignup, showSignin, signup, signin } from '../../../modules/user';
+import { showSignup, signup } from '../../../modules/user';
 
 import './index.css';
 
@@ -60,13 +60,13 @@ const Signup = createReactClass({
     const { signup } = this.props;
     const { username, email, password } = this.state;
 
-    this.setState({ signupDisabled: true });
-
     if (
       this.getValidationState('username') === 'success' &&
       this.getValidationState('email') === 'success' &&
       this.getValidationState('password') === 'success'
     ) {
+      this.setState({ signupDisabled: true });
+
       signup({ username, email, password }, errorMsg => {
         this.setState({ errorMsg });
       });
@@ -171,7 +171,6 @@ const mapDispatchToProps = dispatch =>
     {
       showSignup,
       signup,
-      signin,
       changePage: () => push('/about-us')
     },
     dispatch

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route, Link } from 'react-router-dom';
+import { Route, withRouter } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
@@ -47,12 +47,12 @@ class App extends Component {
           <Navbar.Collapse>
             <Nav>
               <LinkContainer to="/">
-                <NavItem eventKey={1} href="/">
+                <NavItem eventKey={1} href="#">
                   Home
                 </NavItem>
               </LinkContainer>
               <LinkContainer to="/about-us">
-                <NavItem eventKey={2} href="/about-us">
+                <NavItem eventKey={2} href="#">
                   About
                 </NavItem>
               </LinkContainer>
@@ -72,9 +72,6 @@ class App extends Component {
           </Navbar.Collapse>
           <ModalSignup />
         </Navbar>
-
-        <Link to="/">AAAAAAAAAAAAAAAAAA</Link>
-        <Link to="/about-us">BBBBBBBBBBBBBBBB</Link>
 
         <main>
           <Route exact path="/" component={Home} />
@@ -104,4 +101,4 @@ const mapDispatchToProps = dispatch =>
     dispatch
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));

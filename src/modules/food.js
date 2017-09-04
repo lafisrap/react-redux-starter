@@ -24,7 +24,6 @@ export const getFood = q => {
     axios
       .get(`${process.env.REACT_APP_API_URI}/food?q=${q}`)
       .then(response => {
-        console.log(response);
         dispatch({
           type: GET_FOOD,
           payload: response
