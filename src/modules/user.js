@@ -9,7 +9,6 @@ export const SHOW_SIGNIN = 'user/SHOW_SIGNIN';
 const initialState = {
   showSigninModal: false,
   showSignupModal: false,
-  signedIn: false,
   user: null
 };
 
@@ -18,20 +17,20 @@ export default (state = initialState, action) => {
     case SIGNUP:
       return {
         ...state,
-        showSignupModal: false
+        showSignupModal: false,
+        showSigninModal: true
       };
 
     case SIGNIN:
       return {
         ...state,
-        signedIn: true,
+        showSigninModal: false,
         user: action.payload
       };
 
     case SIGNOUT:
       return {
         ...state,
-        signedIn: false,
         user: null
       };
 
@@ -58,50 +57,43 @@ export const signup = (user, errorMsg) => {
       .post(`${process.env.REACT_APP_API_URI}/signup`, user)
       .then(response => {
         const data = response.data;
-        console.log('Response from signup:', response, errorMsg);
         if (!data.success) return errorMsg && errorMsg(data.msg);
         dispatch({
           type: SIGNUP,
-          payload: response
+          payload: data
         });
       })
       .catch(error => {
+        errorMsg && errorMsg(error);
         console.error(error);
       });
   };
 };
 
-export const signin = user => {
+export const signin = (user, errorMsg) => {
   return dispatch => {
     axios
       .post(`${process.env.REACT_APP_API_URI}/signin`, user)
       .then(response => {
-        console.log('Response from signin:', response);
+        const data = response.data;
+        if (!data.success) return errorMsg && errorMsg(data.msg);
         dispatch({
           type: SIGNIN,
-          payload: response
+          payload: data.user
         });
       })
       .catch(error => {
+        errorMsg && errorMsg(error);
         console.error(error);
       });
   };
 };
 
-export const signout = user => {
+export const signout = () => {
   return dispatch => {
-    axios
-      .post(`${process.env.REACT_APP_API_URI}/signout`, user)
-      .then(response => {
-        console.log('Response from signout:', response);
-        dispatch({
-          type: SIGNOUT,
-          payload: response
-        });
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    dispatch({
+      type: SIGNOUT
+    });
   };
 };
 

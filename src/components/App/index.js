@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
-import { Route, withRouter } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Route, withRouter } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 import logo from './logo.svg';
 import Home from '../Home';
 import About from '../About';
 import { getFood } from '../../modules/food';
-import { showSignup, showSignin } from '../../modules/user';
+import { showSignup, showSignin, signout } from '../../modules/user';
 import ModalSignup from '../Modals/Signup';
+import ModalSignin from '../Modals/Signin';
 
 import './index.css';
 
@@ -21,10 +22,18 @@ class App extends Component {
   }
 
   render() {
-    const { signedIn, user, showSignin, showSignup } = this.props;
-    const userArea = signedIn
+    const { user, showSignin, showSignup, signout } = this.props;
+    const userArea = user
       ? <Nav pullRight>
-          {user && user.username}
+          <NavDropdown
+            eventKey={1}
+            title={user.username}
+            id="user-nav-dropdown"
+          >
+            <MenuItem eventKey={1.1} href="#" onClick={() => signout()}>
+              Sign Out
+            </MenuItem>
+          </NavDropdown>
         </Nav>
       : <Nav pullRight>
           <NavItem eventKey={1} href="#" onClick={() => showSignin(true)}>
@@ -70,6 +79,7 @@ class App extends Component {
             </Nav>
             {userArea}
           </Navbar.Collapse>
+          <ModalSignin />
           <ModalSignup />
         </Navbar>
 
@@ -87,7 +97,6 @@ class App extends Component {
 }
 
 const mapStateToProps = state => ({
-  signedIn: state.user.signedIn,
   user: state.user.user
 });
 
@@ -96,7 +105,8 @@ const mapDispatchToProps = dispatch =>
     {
       getFood,
       showSignup,
-      showSignin
+      showSignin,
+      signout
     },
     dispatch
   );

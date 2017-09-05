@@ -1,5 +1,4 @@
-import React from 'react';
-import createReactClass from 'create-react-class';
+import React, { Component } from 'react';
 import { push } from 'react-router-redux';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -18,16 +17,20 @@ import './index.css';
 
 const emailRE = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i; // eslint-disable-line no-useless-escape
 
-const Signup = createReactClass({
-  getInitialState() {
-    return {
+// check ... class Signup extends ...
+class Signup extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
       username: '',
       password: '',
+      passwordRepeat: '',
       email: '',
       signupDisabled: false,
       errorMsg: ''
     };
-  },
+  }
 
   getValidationState(field) {
     const { username, email, password, passwordRepeat } = this.state;
@@ -48,13 +51,13 @@ const Signup = createReactClass({
       default:
         return;
     }
-  },
+  }
 
   handleChange(e, field) {
     const value = { signupDisabled: false, errorMsg: '' };
     value[field] = e.target.value;
     this.setState(value);
-  },
+  }
 
   signUp(e) {
     const { signup } = this.props;
@@ -65,13 +68,17 @@ const Signup = createReactClass({
       this.getValidationState('email') === 'success' &&
       this.getValidationState('password') === 'success'
     ) {
-      this.setState({ signupDisabled: true });
+      this.setState({
+        signupDisabled: true,
+        password: '',
+        passwordRepeat: ''
+      });
 
       signup({ username, email, password }, errorMsg => {
         this.setState({ errorMsg });
       });
     }
-  },
+  }
 
   render() {
     const { showSignupModal, showSignup } = this.props;
@@ -150,7 +157,7 @@ const Signup = createReactClass({
             <Button onClick={() => showSignup(false)}>Cancel</Button>
             <Button
               bsStyle="primary"
-              onClick={this.signUp}
+              onClick={e => this.signUp(e)}
               disabled={signupDisabled}
             >
               Sign Up
@@ -160,7 +167,7 @@ const Signup = createReactClass({
       </div>
     );
   }
-});
+}
 
 const mapStateToProps = state => ({
   showSignupModal: state.user.showSignupModal
