@@ -7,7 +7,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 import logo from './logo.svg';
 import Home from '../Home';
 import About from '../About';
-import { getFood } from '../../modules/food';
 import { showSignup, showSignin, signout } from '../../modules/user';
 import ModalSignup from '../Modals/Signup';
 import ModalSignin from '../Modals/Signin';
@@ -15,12 +14,6 @@ import ModalSignin from '../Modals/Signin';
 import './index.css';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-
-    props.getFood('Milk');
-  }
-
   render() {
     const { user, showSignin, showSignup, signout } = this.props;
     const userArea = user
@@ -103,7 +96,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      getFood,
       showSignup,
       showSignin,
       signout

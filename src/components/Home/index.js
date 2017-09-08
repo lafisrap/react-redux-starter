@@ -1,48 +1,117 @@
-import React from 'react'
-import { push } from 'react-router-redux'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
+import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import {
-  increment,
-  incrementAsync,
-  decrement,
-  decrementAsync
-} from '../../modules/counter'
+  Media,
+  ButtonToolbar,
+  SplitButton,
+  MenuItem,
+  Panel,
+  Button
+} from 'react-bootstrap';
+import { getBars, bookBar } from '../../modules/bars';
 
-const Home = props => (
-  <div>
-    <h1>Home</h1>
-    <p>Count: {props.count}</p>
+class Home extends Component {
+  componentDidMount() {
+    this.props.getBars('Turiner Straße 21, Berlin');
+  }
 
-    <p>
-      <button onClick={props.increment} disabled={props.isIncrementing}>Increment</button>
-      <button onClick={props.incrementAsync} disabled={props.isIncrementing}>Increment Async</button>
-    </p>
+  render() {
+    const { bars, user, bookBar } = this.props;
 
-    <p>
-      <button onClick={props.decrement} disabled={props.isDecrementing}>Decrementing</button>
-      <button onClick={props.decrementAsync} disabled={props.isDecrementing}>Decrement Async</button>
-    </p>
+    if (!bars || !bars.length) return <div className="spinner" />;
 
-    <p><button onClick={() => props.changePage()}>Go to about page via redux</button></p>
-  </div>
-)
+    return (
+      <section id="home">
+        <Panel>
+          {bars.map(bar => {
+            const {
+              id,
+              url,
+              image_url,
+              name,
+              rating,
+              price,
+              bookedby,
+              location
+            } = bar;
+            const num = (bookedby && bookedby.length) || 0;
+            const booked =
+              (user && bookedby && bookedby.indexOf(user.username) > -1) ||
+              false;
+            const button =
+              user &&
+              (booked
+                ? <Button onClick={() => bookBar(id, false, user)}>
+                    Cancel Booking
+                  </Button>
+                : <Button onClick={() => bookBar(id, true, user)}>
+                    Book
+                  </Button>);
+            const bookedList = num
+              ? <ButtonToolbar>
+                  <SplitButton
+                    title={`${num} going.`}
+                    dropup
+                    id="split-button-dropup"
+                  >
+                    {bookedby.map((username, i) =>
+                      <MenuItem key={username} eventKey={i + 1}>
+                        {username}
+                      </MenuItem>
+                    )}
+                  </SplitButton>
+                  {button}
+                </ButtonToolbar>
+              : <div>
+                  No bookings yet {button}
+                </div>;
+
+            return (
+              <Media key={id}>
+                <Media.Left>
+                  <a href={url}>
+                    <img width={128} height={128} src={image_url} alt={name} />
+                  </a>
+                </Media.Left>
+                <Media.Body>
+                  <Media.Heading>
+                    {name}
+                  </Media.Heading>
+                  <p>{`Rating: ${rating}`}</p>
+                  <p>{`Price: ${price}`}</p>
+                  <p>
+                    {location.display_address.map(line =>
+                      <span key={line}>
+                        {line}
+                        <br />
+                      </span>
+                    )}
+                  </p>
+                  {bookedList}
+                </Media.Body>
+                <Media.Right />
+              </Media>
+            );
+          })}
+        </Panel>
+      </section>
+    );
+  }
+}
 
 const mapStateToProps = state => ({
-  count: state.counter.count,
-  isIncrementing: state.counter.isIncrementing,
-  isDecrementing: state.counter.isDecrementing
-})
+  bars: state.bars.bars,
+  user: state.user.user
+});
 
-const mapDispatchToProps = dispatch => bindActionCreators({
-  increment,
-  incrementAsync,
-  decrement,
-  decrementAsync,
-  changePage: () => push('/about-us')
-}, dispatch)
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      getBars,
+      bookBar
+    },
+    dispatch
+  );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Home)
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
