@@ -36,5 +36,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  }
+  },
+  "devServer": {
+    "compress": true,
+    "public": "https://fcc-stockmarket-client.herokuapp.com/"
+  }  
 }
