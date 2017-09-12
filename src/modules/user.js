@@ -7,9 +7,9 @@ export const SHOW_SIGNUP = 'user/SHOW_SIGNUP';
 export const SHOW_SIGNIN = 'user/SHOW_SIGNIN';
 
 const initialState = {
+  user: null,
   showSigninModal: false,
-  showSignupModal: false,
-  user: null
+  showSignupModal: false
 };
 
 export default (state = initialState, action) => {
@@ -77,6 +77,7 @@ export const signin = (user, errorMsg) => {
       .then(response => {
         const data = response.data;
         if (!data.success) return errorMsg && errorMsg(data.msg);
+        axios.defaults.headers.common['Authorization'] = data.user.token;
         dispatch({
           type: SIGNIN,
           payload: data.user
@@ -91,6 +92,7 @@ export const signin = (user, errorMsg) => {
 
 export const signout = () => {
   return dispatch => {
+    axios.defaults.headers.common['Authorization'] = undefined;
     dispatch({
       type: SIGNOUT
     });

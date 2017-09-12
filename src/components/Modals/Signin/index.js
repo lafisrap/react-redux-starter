@@ -49,6 +49,11 @@ class Signin extends Component {
     const { showSigninModal, showSignin } = this.props;
     const { errorMsg, username, password } = this.state;
 
+    console.assert(
+      typeof errorMsg === 'string',
+      'Error messages must be string values.'
+    );
+
     return (
       <div className="static-modal">
         <Modal show={showSigninModal} onHide={() => showSignin(false)}>

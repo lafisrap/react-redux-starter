@@ -20,10 +20,13 @@ export default (state = initialState, action) => {
 };
 
 export const getFood = q => {
+  console.log(1, 'response');
   return dispatch => {
+    console.log(2, 'response');
     axios
       .get(`${process.env.REACT_APP_API_URI}/food?q=${q}`)
       .then(response => {
+        console.log(response);
         dispatch({
           type: GET_FOOD,
           payload: response
