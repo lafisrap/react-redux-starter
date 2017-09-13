@@ -3,7 +3,7 @@ import { Nav, Navbar, NavItem } from 'react-bootstrap';
 import { Route, withRouter } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 import logo from './logo.svg';
-import Home from '../Home';
+import Home from '../Stocks';
 import UserArea from './UserArea';
 import ModalSignup from '../Modals/Signup';
 import ModalSignin from '../Modals/Signin';
@@ -11,6 +11,7 @@ import ModalSignin from '../Modals/Signin';
 import './index.css';
 
 const App = props => {
+  // with ES6 import
   return (
     <div className="App">
       <Navbar inverse collapseOnSelect>
