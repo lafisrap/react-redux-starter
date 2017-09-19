@@ -1,43 +1,68 @@
-export const ADD_QUOTE = 'stock/ADD_QUOTE';
-export const REMOVE_QUOTE = 'stock/REMOVE_QUOTE';
-export const ADDED_QUOTE = 'stock/ADDED_QUOTE';
-export const REMOVED_QUOTE = 'stock/REMOVED_QUOTE';
+import axios from 'axios';
+import moment from 'moment';
+
+export const ADD_STOCK = 'stock/ADD_STOCK';
+export const REMOVE_STOCK = 'stock/REMOVE_STOCK';
+export const UPDATE_STOCK_DATA = 'stock/UPDATE_STOCK_DATA';
+
+const QUANDL_API = 'https://www.quandl.com/api/v3/datasets/WIKI/';
 
 const initialState = {
-  quotes: []
+  stocks: [],
+  startDate: moment().subtract(1, 'year'),
+  endDate: moment()
 };
 
 export default (state = initialState, action) => {
-  let quote, index;
+  let stock, index;
 
   switch (action.type) {
-    case ADD_QUOTE:
-    case ADDED_QUOTE:
-      quote = state.quotes.find(quote => quote.name === action.payload.name);
-      index = state.quotes.indexOf(quote);
+    case ADD_STOCK:
+      stock = state.stocks.find(
+        stock => stock.symbol === action.payload.symbol
+      );
+      index = state.stocks.indexOf(stock);
 
       // Don't add if it is already there
       if (index > -1) return state;
 
       return {
         ...state,
-        quotes: [...state.quotes, action.payload]
+        stocks: [...state.stocks, action.payload]
       };
 
-    case REMOVE_QUOTE:
-    case REMOVED_QUOTE:
-      quote = state.quotes.find(quote => quote.name === action.payload.name);
-      index = state.quotes.indexOf(quote);
-      console.log(6, 'REMOVE_QUOTE', index, quote);
+    case UPDATE_STOCK_DATA:
+      stock = state.stocks.find(
+        stock => stock.symbol === action.payload.symbol
+      );
+      index = state.stocks.indexOf(stock);
+
+      // Don't update if stock is not there
+      if (index === -1) return state;
+
+      return {
+        ...state,
+        stocks: [
+          ...state.stocks.slice(0, index),
+          action.payload,
+          ...state.stocks.slice(index + 1)
+        ]
+      };
+
+    case REMOVE_STOCK:
+      stock = state.stocks.find(
+        stock => stock.symbol === action.payload.symbol
+      );
+      index = state.stocks.indexOf(stock);
 
       // Don't remove if it is not there
       if (index === -1) return state;
 
       return {
         ...state,
-        quotes: [
-          ...state.quotes.slice(0, index),
-          ...state.quotes.slice(index + 1)
+        stocks: [
+          ...state.stocks.slice(0, index),
+          ...state.stocks.slice(index + 1)
         ]
       };
 
@@ -46,22 +71,51 @@ export default (state = initialState, action) => {
   }
 };
 
-export const addQuote = quote => {
-  return (dispatch, setState, { emit }) => {
-    emit('add-quote', JSON.stringify(quote));
+export const addStock = options => {
+  return dispatch => {
     dispatch({
-      type: ADD_QUOTE,
-      payload: quote
+      type: ADD_STOCK,
+      payload: options
+    });
+    loadQuotes(options, response =>
+      updateStockData(dispatch, options, response)
+    );
+  };
+};
+
+export const removeStock = options => {
+  return dispatch => {
+    dispatch({
+      type: REMOVE_STOCK,
+      payload: options
     });
   };
 };
 
-export const removeQuote = quote => {
-  return (dispatch, setState, { emit }) => {
-    emit('remove-quote', JSON.stringify(quote));
-    dispatch({
-      type: REMOVE_QUOTE,
-      payload: quote
+const loadQuotes = ({ symbol, startDate, endDate }, done) => {
+  axios
+    .get(
+      `${QUANDL_API}${symbol}.json?start_date=${startDate.format(
+        'YYYY-MM-DD'
+      )}&end_date=${endDate.format(
+        'YYYY-MM-DD'
+      )}&order=asc&column_index=4&transformation=rdiff`
+    )
+    .then(response => done(response))
+    .catch(error => {
+      console.error(error);
     });
-  };
+};
+
+const updateStockData = (dispatch, options, response) => {
+  const { data, name, description } = response.data.dataset;
+  dispatch({
+    type: UPDATE_STOCK_DATA,
+    payload: {
+      ...options,
+      data,
+      name,
+      description
+    }
+  });
 };

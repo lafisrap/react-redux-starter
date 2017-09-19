@@ -1,58 +1,70 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { addQuote, removeQuote } from '../../modules/stocks';
+import { addStock, removeStock } from '../../modules/stocks';
+import { emitMessage } from '../../websockets';
 
 let counter1 = 1;
 let counter2 = 1;
+const stocks = ['AAPL', 'MSFT', 'GOOG', 'FB'];
 
 class Stocks extends Component {
-  componentDidMount() {}
+  addStock() {
+    const { addStock, startDate, endDate } = this.props;
 
-  addQuote() {
-    const { addQuote } = this.props;
-
-    addQuote({
-      name: 'TEST' + counter1++
+    addStock({
+      symbol: stocks[counter1],
+      startDate,
+      endDate
     });
+
+    emitMessage('addStock', stocks[counter1]);
+
+    counter1++;
   }
 
-  removeQuote() {
-    const { removeQuote } = this.props;
+  removeStock() {
+    const { removeStock } = this.props;
 
-    removeQuote({
-      name: 'TEST' + counter2++
+    removeStock({
+      symbol: stocks[counter2]
     });
+
+    emitMessage('removeStock', stocks[counter2]);
+
+    counter2++;
   }
 
   render() {
-    const { quotes } = this.props;
+    const { stocks } = this.props;
 
-    //if (!quotes || !quotes.length) return <div className="spinner">No quotes.</div>;
+    //if (!stocks || !stocks.length) return <div className="spinner">No stocks.</div>;
 
     return (
       <div className="Stocks_Container">
-        {quotes.map((quote, i) => (
+        {stocks.map((stock, i) => (
           <div className="test" key={i}>
-            {quote.name}
+            {`${stock.symbol}, ${stock.name}`}
           </div>
         ))}
-        <button onClick={() => this.addQuote()}>Add Quote</button>
-        <button onClick={() => this.removeQuote()}>Remove Quote</button>
+        <button onClick={() => this.addStock()}>Add Stock</button>
+        <button onClick={() => this.removeStock()}>Remove Stock</button>
       </div>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  quotes: state.stocks.quotes
+  stocks: state.stocks.stocks,
+  startDate: state.stocks.startDate,
+  endDate: state.stocks.endDate
 });
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      addQuote,
-      removeQuote
+      addStock,
+      removeStock
     },
     dispatch
   );

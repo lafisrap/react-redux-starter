@@ -7,6 +7,7 @@ import Home from '../Stocks';
 import UserArea from './UserArea';
 import ModalSignup from '../Modals/Signup';
 import ModalSignin from '../Modals/Signin';
+import StocksConnector from '../StocksConnector';
 
 import './index.css';
 
@@ -29,6 +30,7 @@ const App = props => {
               </NavItem>
             </LinkContainer>
           </Nav>
+          <StocksConnector />
           <UserArea />
         </Navbar.Collapse>
         <ModalSignin />
