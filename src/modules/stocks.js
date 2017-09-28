@@ -1,4 +1,3 @@
-import axios from 'axios';
 import moment from 'moment';
 
 export const ADD_STOCK = 'stock/ADD_STOCK';
@@ -40,6 +39,10 @@ export default (state = initialState, action) => {
       // Don't update if stock is not there
       if (index === -1) return state;
 
+      // Shorten the name
+      const bracketPos = Math.max(action.payload.name.search(/\(/) - 1, 0);
+      action.payload.name = action.payload.name.slice(0, bracketPos);
+
       return {
         ...state,
         stocks: [
@@ -71,15 +74,13 @@ export default (state = initialState, action) => {
   }
 };
 
-export const addStock = options => {
+export const addStock = stock => {
   return dispatch => {
     dispatch({
       type: ADD_STOCK,
-      payload: options
+      payload: stock
     });
-    loadQuotes(options, response =>
-      updateStockData(dispatch, options, response)
-    );
+    loadQuotes(stock, response => updateStockData(dispatch, stock, response));
   };
 };
 
@@ -93,26 +94,29 @@ export const removeStock = options => {
 };
 
 const loadQuotes = ({ symbol, startDate, endDate }, done) => {
-  axios
-    .get(
-      `${QUANDL_API}${symbol}.json?start_date=${startDate.format(
-        'YYYY-MM-DD'
-      )}&end_date=${endDate.format(
-        'YYYY-MM-DD'
-      )}&order=asc&column_index=4&transformation=rdiff`
-    )
+  fetch(
+    `${QUANDL_API}${symbol}.json?start_date=${startDate.format(
+      'YYYY-MM-DD'
+    )}&end_date=${endDate.format(
+      'YYYY-MM-DD'
+    )}&order=asc&column_index=4&transformation=rdiff`
+  )
+    .then(response => {
+      if (response.ok) return response.json();
+      throw new Error(response.statusText);
+    })
     .then(response => done(response))
     .catch(error => {
       console.error(error);
     });
 };
 
-const updateStockData = (dispatch, options, response) => {
-  const { data, name, description } = response.data.dataset;
+const updateStockData = (dispatch, stock, response) => {
+  const { data, name, description } = response.dataset;
   dispatch({
     type: UPDATE_STOCK_DATA,
     payload: {
-      ...options,
+      ...stock,
       data,
       name,
       description

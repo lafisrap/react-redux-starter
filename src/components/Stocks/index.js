@@ -1,72 +1,74 @@
 import React, { Component } from 'react';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { addStock, removeStock } from '../../modules/stocks';
-import { emitMessage } from '../../websockets';
+import Stock from '../Stock';
+import Chart from '../Chart';
+import SearchInput from '../SearchInput';
+import moment from 'moment';
 
-let counter1 = 1;
-let counter2 = 1;
-const stocks = ['AAPL', 'MSFT', 'GOOG', 'FB'];
+import './index.css';
 
 class Stocks extends Component {
-  addStock() {
-    const { addStock, startDate, endDate } = this.props;
+  convertToChartData(stocks) {
+    if (!stocks || !stocks.length) return null;
 
-    addStock({
-      symbol: stocks[counter1],
-      startDate,
-      endDate
-    });
+    const names = stocks.reduce((acc, stock) => {
+      const { data, name } = stock;
 
-    emitMessage('addStock', stocks[counter1]);
+      if (!data) return acc;
 
-    counter1++;
-  }
+      return acc.concat(name);
+    }, []);
 
-  removeStock() {
-    const { removeStock } = this.props;
+    let data = null;
+    if (stocks[0].data) {
+      data = stocks[0].data.map(d => {
+        const date = d[0];
+        const obj = { date };
+        names.map(name => {
+          const stock = stocks.find(stock => stock.name === name);
+          const rate = stock.data.find(d => d[0] === date);
+          obj[name] = (rate && rate[1]) || null;
+        });
 
-    removeStock({
-      symbol: stocks[counter2]
-    });
+        return obj;
+      });
+    }
 
-    emitMessage('removeStock', stocks[counter2]);
+    console.log(4, names, data);
 
-    counter2++;
+    return { names, data };
   }
 
   render() {
     const { stocks } = this.props;
+    const chartData = this.convertToChartData(stocks);
+    const chart =
+      chartData && chartData.names && chartData.names.length ? (
+        <Chart chartData={chartData} />
+      ) : (
+        <div>No chart data available.</div>
+      );
 
-    //if (!stocks || !stocks.length) return <div className="spinner">No stocks.</div>;
+    console.log(
+      7,
+      chartData,
+      chartData && chartData.names && chartData.names.length
+    );
 
     return (
       <div className="Stocks_Container">
-        {stocks.map((stock, i) => (
-          <div className="test" key={i}>
-            {`${stock.symbol}, ${stock.name}`}
-          </div>
-        ))}
-        <button onClick={() => this.addStock()}>Add Stock</button>
-        <button onClick={() => this.removeStock()}>Remove Stock</button>
+        {chart}
+        <SearchInput />
+        <div className="Stocks_List">
+          {stocks.map(stock => <Stock key={stock.symbol} stock={stock} />)}
+        </div>
       </div>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  stocks: state.stocks.stocks,
-  startDate: state.stocks.startDate,
-  endDate: state.stocks.endDate
+  stocks: state.stocks.stocks
 });
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators(
-    {
-      addStock,
-      removeStock
-    },
-    dispatch
-  );
-
-export default connect(mapStateToProps, mapDispatchToProps)(Stocks);
+export default connect(mapStateToProps)(Stocks);

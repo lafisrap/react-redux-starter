@@ -1,0 +1,15 @@
+.Stock_Container {
+  width: 33.333333%;
+  border: 2px solid grey;
+  margin: 5px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.Stock_Container h3 {
+  margin-top: 0;
+}
+
+.Stock_Button {
+  font-size: 18px !important;
+}

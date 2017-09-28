@@ -2,28 +2,13 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { addStock, removeStock } from '../../modules/stocks';
-import { connectWebsocket } from '../../websockets';
+import ReactWebsocketsComponent from 'react-websockets-component';
 
 import './index.css';
-
-const SERVICES = [
-  'connect',
-  'disconnect',
-  'addStock',
-  'removeStock',
-  'clientsConnected'
-];
 
 class StocksConnector extends Component {
   constructor(props) {
     super(props);
-
-    connectWebsocket({
-      uri: process.env.REACT_APP_SOCKET_URI,
-      services: SERVICES.map(service => {
-        return { service, callback: this[service].bind(this) };
-      })
-    });
 
     this.state = {
       clientsConnected: 0
@@ -39,9 +24,11 @@ class StocksConnector extends Component {
   }
 
   addStock(symbol) {
-    const { addStock, startDate, endDate } = this.props;
+    const { stocks, addStock, startDate, endDate } = this.props;
 
-    addStock({ symbol, startDate, endDate });
+    if (!stocks.find(stock => stock.symbol === symbol)) {
+      addStock({ symbol, startDate, endDate });
+    }
   }
 
   removeStock(symbol) {
@@ -58,15 +45,27 @@ class StocksConnector extends Component {
     const { clientsConnected } = this.state;
 
     return (
-      <span className="StocksConnector">{`${clientsConnected} ${clientsConnected ===
-      1
-        ? 'client'
-        : 'clients'} connected.`}</span>
+      <div>
+        <ReactWebsocketsComponent
+          uri={process.env.REACT_APP_SOCKET_URI}
+          onConnect={data => this.connect(data)}
+          onDisconnect={data => this.disconnect(data)}
+          onAddStock={data => this.addStock(data)}
+          onRemoveStock={data => this.removeStock(data)}
+          onClientsConnected={data => this.clientsConnected(data)}
+        />
+        <span className="StocksConnector">
+          {`${clientsConnected} ${clientsConnected === 1
+            ? 'client'
+            : 'clients'} connected.`}
+        </span>
+      </div>
     );
   }
 }
 
 const mapStateToProps = state => ({
+  stocks: state.stocks.stocks,
   startDate: state.stocks.startDate,
   endDate: state.stocks.endDate
 });

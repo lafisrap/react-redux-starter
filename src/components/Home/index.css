@@ -1,0 +1,6 @@
+.Home_section {
+  max-width: 1168px;
+  background-color: rgba(0, 0, 40, 0.3);
+  border: 1px solid rgba(0, 0, 40, 0.6);
+  border-radius: 25px;
+}

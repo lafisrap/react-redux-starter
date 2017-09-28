@@ -1,0 +1,12 @@
+.Stocks_Container {
+  margin: 30px auto;
+  max-width: 1168px;
+  background-color: rgba(0, 0, 40, 0.15);
+  border: 1px solid rgba(0, 0, 40, 0.3);
+  border-radius: 25px;
+  padding: 20px;
+}
+
+.Stocks_List {
+  display: flex;
+}
